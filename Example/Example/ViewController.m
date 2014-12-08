@@ -13,7 +13,7 @@
 #import "JSVenueObject.h"
 #import "JSDemandsObject.h"
 
-#define kJSEventAPIKey @"jv2WCKLdZjgb5w9s"
+#define kJSEventAPIKey @"APIKEY"
 
 @interface ViewController () <JSEventAPIDelegate>
 @property (nonatomic) UIActivityIndicatorView *indicator;
