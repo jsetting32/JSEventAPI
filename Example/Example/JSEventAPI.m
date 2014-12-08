@@ -331,16 +331,6 @@ enum {
         return;
     }
     
-    if (!keywords || [keywords length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"The 'keywords' parameter is required."];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Set the parameter to a string that represents a performer"}];
-        completionblock(nil, error);
-        return;
-    }
-    
     NSString *query = [self generateQueryWithType:JSQueryPerformers
                                          objectId:nil
                                          keywords:keywords
@@ -353,7 +343,7 @@ enum {
                                        sortByType:type
                                     sortDirection:direction
                                          censored:nil];
-    
+        
     [NSURLConnection sendAsynchronousRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:query]]
                                        queue:[NSOperationQueue mainQueue]
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
@@ -364,6 +354,16 @@ enum {
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                               
+                               if ([json[@"error"] integerValue] == 1) {
+                                   NSString *reason = [NSString stringWithFormat:@"%@", json[@"description"]];
+                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
+                                                                        code:301
+                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
+                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
+                                   completionblock(nil, error);
+                                   return;
+                               }
                                
                                NSMutableArray *arr = [NSMutableArray array];
                                if ([json[@"performers"] isEqual:[NSNull null]]) {
@@ -446,16 +446,6 @@ enum {
         return;
     }
     
-    if (!keywords || [keywords length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"The 'keywords' parameter is required."];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Set the parameter to a string that represents a performer"}];
-        completionblock(nil, error);
-        return;
-    }
-    
     NSString *query = [self generateQueryWithType:JSQueryDemands
                                          objectId:nil
                                          keywords:keywords
@@ -479,6 +469,17 @@ enum {
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                            
+                               
+                               if ([json[@"error"] integerValue] == 1) {
+                                   NSString *reason = [NSString stringWithFormat:@"%@", json[@"description"]];
+                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
+                                                                        code:301
+                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
+                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
+                                   completionblock(nil, error);
+                                   return;
+                               }
                                
                                NSMutableArray *arr = [NSMutableArray array];
                                if ([json[@"demands"] isEqual:[NSNull null]]) {
@@ -604,11 +605,11 @@ enum {
     
     
     if (type == 0) {
-        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&keywords=%@&%@&date=%@&category=%@&sort_order=%@&sort_direction=%@&mature=%@&page_number=%ld",
+        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&%@%@&date=%@&category=%@&sort_order=%@&sort_direction=%@&mature=%@&page_number=%ld",
                 kJSQueryEvents,
                 kJSQuerySearch,
                 self.apiKey,
-                (keywords) ? [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] : @"",
+                (keywords) ? [NSString stringWithFormat:@"keywords=%@&", [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] : @"",
                 (coords) ? [NSString stringWithFormat:@"where=%@,%@&within=%@&metric=%@", coords[@"latitude"], coords[@"longitude"], (radius) ? radius : @"", (metric) ? metric : @""] : [NSString stringWithFormat:@"location=%@", [location stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]],
                 (date) ? date : @"",
                 (category) ? category : @"",
@@ -617,30 +618,30 @@ enum {
                 (censored) ? @"safe" : @"all",
                 (long)self.eventsPageNumber];
     } else if (type == 1) {
-        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&keywords%@&%@&sort_order=%@&sort_direction=%@&page_number=%li",
+        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&%@%@&sort_order=%@&sort_direction=%@&page_number=%li",
                 kJSQueryVenues,
                 kJSQuerySearch,
                 self.apiKey,
-                (keywords) ? [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] : @"",
+                (keywords) ? [NSString stringWithFormat:@"keywords=%@&", [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] : @"",
                 (coords) ? [NSString stringWithFormat:@"where=%@,%@&within=%@&metric=%@", coords[@"latitude"], coords[@"longitude"], (radius) ? radius : @"", (metric) ? metric : @""] : [NSString stringWithFormat:@"location=%@", [location stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]],
                 (sortType) ? sortType : @"",
                 (direction) ? direction : @"",
                 self.venuesPageNumber];
     } else if (type == 2) {
-        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&keywords=%@&sort_order=%@&sort_direction=%@&page_number=%li",
+        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&%@sort_order=%@&sort_direction=%@&page_number=%li",
                 kJSQueryPerformers,
                 kJSQuerySearch,
                 self.apiKey,
-                (keywords) ? [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] : @"",
+                (keywords) ? [NSString stringWithFormat:@"keywords=%@&", [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] : @"",
                 (sortType) ? sortType : @"",
                 (direction) ? direction : @"",
                 self.performersPageNumber];
     } else if (type == 3) {
-        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&keywords=%@&%@&sort_order=%@&sort_direction=%@&page_number=%li",
+        return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/%@?app_key=%@&%@%@&sort_order=%@&sort_direction=%@&page_number=%li",
                 kJSQueryDemands,
                 kJSQuerySearch,
                 self.apiKey,
-                (keywords) ? [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] : @"",
+                (keywords) ? [NSString stringWithFormat:@"keywords=%@&", [keywords stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] : @"",
                 (coords) ? [NSString stringWithFormat:@"where=%@,%@&within=%@&metric=%@", coords[@"latitude"], coords[@"longitude"], (radius) ? radius : @"", (metric) ? metric : @""] : (location) ? [NSString stringWithFormat:@"location=%@", [location stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] : @"location=",
                 (sortType) ? sortType : @"",
                 (direction) ? direction : @"",

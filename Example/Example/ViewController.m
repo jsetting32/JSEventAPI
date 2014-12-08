@@ -28,10 +28,10 @@
     
     [self.view setBackgroundColor:[UIColor blackColor]];
     
-    JSEventAPI *weather = [JSEventAPI sharedInstance];
-    [weather setApiKey:kJSEventAPIKey];
-    [weather setDelegate:self];
-    [weather getCurrentLocation];
+    JSEventAPI *eventAPI = [JSEventAPI sharedInstance];
+    [eventAPI setApiKey:kJSEventAPIKey];
+    [eventAPI setDelegate:self];
+    [eventAPI getCurrentLocation];
     
     indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
     [indicator setFrame:CGRectMake(self.view.frame.size.width / 2.0f - indicator.frame.size.width / 2.0f,
@@ -39,22 +39,12 @@
                                    indicator.frame.size.width, indicator.frame.size.height)];
     [self.view addSubview:indicator];
     
-        
-    /*
-    [weather queryForCategories:^(NSArray *categories, NSError *error) {
-        if (error) {
-            [[[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] show];
-            return;
-        }
-        NSLog(@"%@", categories);
-    }];
-    */
 }
 
 - (IBAction)didTapNext:(id)sender {
     [indicator startAnimating];
     
-    /*
+    
     [[JSEventAPI sharedInstance] queryForEventsWithKeywords:nil geoCoords:nil location:@"San Francisco, CA" date:nil category:nil withinRadius:nil radiusMetric:nil sortByType:nil sortDirection:nil censored:nil block:^(NSArray *objects, NSError *error) {
         [indicator stopAnimating];
         if (error) {
@@ -67,7 +57,7 @@
         }
 
     }];
-    */
+    
     
     /*
     [[JSEventAPI sharedInstance] queryForVenueById:@"V0-001-002084688-9" block:^(JSVenueObject *venue, NSError *error) {
@@ -123,10 +113,6 @@
 - (void)JSEventAPI:(JSEventAPI *)weather didReceiveCurrentLocation:(NSDictionary *)dict
 {
     [indicator startAnimating];
-
-    //E0-001-078254593-2
-    //V0-001-002084688-9
-    //P0-001-000000790-5
     
     /*
     [[JSEventAPI sharedInstance] queryForEventById:@"E0-001-078254593-2" block:^(JSEventObject *event, NSError *error) {
@@ -135,7 +121,7 @@
     }];
     */
     
-    /*
+    
     [[JSEventAPI sharedInstance] queryForEventsWithKeywords:nil geoCoords:nil location:@"San Francisco, CA" date:nil category:nil withinRadius:nil radiusMetric:nil sortByType:nil sortDirection:nil censored:nil block:^(NSArray *objects, NSError *error) {
         [indicator stopAnimating];
         if (error) {
@@ -148,7 +134,7 @@
         }
         
     }];
-    */
+    
     
     /*
     [[JSEventAPI sharedInstance] queryForVenueById:@"V0-001-002084688-9" block:^(JSVenueObject *venue, NSError *error) {
@@ -181,8 +167,9 @@
         NSLog(@"%@", performer.objects);
     }];
      */
+    
     /*
-    [[JSEventAPI sharedInstance] queryForPerformersWithKeywords:@"Linkin Park" sortByType:nil sortDirection:nil block:^(NSArray *objects, NSError *error) {
+    [[JSEventAPI sharedInstance] queryForPerformersWithKeywords:nil sortByType:nil sortDirection:nil block:^(NSArray *objects, NSError *error) {
         [indicator stopAnimating];
         if (error) {
             [[[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] show];
@@ -210,7 +197,8 @@
     */
     
     
-    [[JSEventAPI sharedInstance] queryForDemandsWithKeywords:@"linkin park" geoCoords:nil location:nil sortByType:nil sortDirection:nil block:^(NSArray *objects, NSError *error) {
+    /*
+    [[JSEventAPI sharedInstance] queryForDemandsWithKeywords:nil geoCoords:nil location:nil sortByType:nil sortDirection:nil block:^(NSArray *objects, NSError *error) {
         [indicator stopAnimating];
         if (error) {
             [[[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] show];
@@ -221,6 +209,7 @@
             NSLog(@"%@", obj.objects);
         }
     }];
+    */
     
     
     /*

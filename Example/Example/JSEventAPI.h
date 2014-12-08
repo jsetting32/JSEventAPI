@@ -49,7 +49,7 @@
  'NSLocationWhenInUseUsageDescription', 'privacy - location usage description', and/or
  'NSLocationAlwaysUsageDescription' filled with a user friendly message.
  
- Conform as the delegate of this class to further query for weather data
+ Conform as the delegate of this class to further query for event data
  */
 - (void)getCurrentLocation;
 

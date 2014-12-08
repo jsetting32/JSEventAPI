@@ -129,33 +129,8 @@
     } else {
         self.JSPerformerEvents = [NSArray array];
     }
-    
-    
-    /*
-     @property (nonatomic) NSDictionary *objects;
-     @property (nonatomic) NSString *JSPerformerId;
-     @property (nonatomic) NSString *JSPerformerURL;
-     @property (nonatomic) NSString *JSPerformerName;
-     @property (nonatomic) BOOL JSPerformerIsHuman;
-     @property (nonatomic) NSString *JSPerformerShortBio;
-     @property (nonatomic) NSString *JSPerformerLongBio;
-     @property (nonatomic) NSNumber *JSPerformerDemandCount;
-     @property (nonatomic) NSNumber *JSPerformerDemandMemberCount;
-     @property (nonatomic) NSNumber *JSPerformerEventCount;
-     @property (nonatomic) id JSPerformerCreated;
-     @property (nonatomic) NSString *JSPerformerCreator;
-     @property (nonatomic) BOOL JSPerformerWithdrawn;
-     @property (nonatomic) NSString *JSPerformerWithdrawnReason;
-     @property (nonatomic) NSArray *JSPerformerLinks;
-     @property (nonatomic) NSArray *JSPerformerComments;
-     @property (nonatomic) NSArray *JSPerformerImages;
-     @property (nonatomic) NSArray *JSPerformerTags;
-     @property (nonatomic) NSArray *JSPerformerDemands;
-     @property (nonatomic) NSArray *JSPerformerEvents;
-     */
 
-    self.objects = [NSDictionary dictionaryWithObjects:@[
-                                                         self.JSPerformerId,
+    self.objects = [NSDictionary dictionaryWithObjects:@[self.JSPerformerId,
                                                          self.JSPerformerURL,
                                                          self.JSPerformerName,
                                                          self.JSPerformerIsHuman,
