@@ -138,6 +138,7 @@ And the result is:
 
 ```Objective-C
 - (void)queryForEventById:(NSString *)eventId block:(void(^)(JSEventObject * event, NSError * error))completionBlock;
+
 - (void)queryForEventsWithKeywords:(NSString *)keywords
                          geoCoords:(NSDictionary *)coords
                           location:(NSString *)location
@@ -149,7 +150,9 @@ And the result is:
                      sortDirection:(NSString *)direction
                           censored:(BOOL)censored
                              block:(void(^)(NSArray *objects, NSError *error))completionblock;
+
 - (void)queryForVenueById:(NSString *)venueId block:(void(^)(JSVenueObject * venue, NSError * error))completionBlock;
+
 - (void)queryForVenuesWithKeywords:(NSString *)keywords
                          geoCoords:(NSDictionary *)coords
                           location:(NSString *)location
@@ -158,18 +161,23 @@ And the result is:
                         sortByType:(NSString *)type
                      sortDirection:(NSString *)direction
                              block:(void(^)(NSArray *objects, NSError *error))completionblock;
+                             
 - (void)queryForPerformerById:(NSString *)performerId block:(void(^)(JSPerformerObject * performer, NSError * error))completionBlock;
+
 - (void)queryForPerformersWithKeywords:(NSString *)keywords
                             sortByType:(NSString *)type
                          sortDirection:(NSString *)direction
                                  block:(void(^)(NSArray *objects, NSError *error))completionblock;
+                                 
 - (void)queryForDemandById:(NSString *)demandId block:(void(^)(JSDemandsObject * demand, NSError * error))completionBlock;
+
 - (void)queryForDemandsWithKeywords:(NSString *)keywords
                           geoCoords:(NSDictionary *)coods
                            location:(NSString *)location
                          sortByType:(NSString *)type
                       sortDirection:(NSString *)direction
                               block:(void(^)(NSArray *objects, NSError *error))completionblock;
+
 - (void)queryForCategories:(void(^)(NSArray * categories, NSError *error))completionblock;
 ```
 
