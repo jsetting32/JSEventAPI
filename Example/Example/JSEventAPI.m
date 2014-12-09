@@ -34,14 +34,6 @@ enum {
     return instance;
 }
 
-
-- (id)init
-{
-    if (!(self = [super init])) return nil;
-    [self resetPageCounters];
-    return self;
-}
-
 - (void)resetPageCounters
 {
     self.eventsPageNumber = 1;
@@ -57,15 +49,10 @@ enum {
     [self.JSLocation getCurrentLocation];
 }
 
-- (void)queryForEventById:(NSString *)eventId block:(void (^)(JSEventObject * event, NSError *error))completionBlock
+- (void)queryForEventById:(NSString *)eventId block:(void (^)(JSEventObject * event, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionBlock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -87,13 +74,19 @@ enum {
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                                
                                if (error) {
-                                   completionBlock(nil, error);
+                                   completionblock(nil, error);
                                    return;
                                }
                     
-                               
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-                               completionBlock([[JSEventObject alloc] initWithData:json], nil);
+                               NSError *e = [self checkForJsonError:json query:kJSQueryEvents];
+                               
+                               if (e) {
+                                   completionblock(nil, e);
+                                   return;
+                               }
+                               
+                               completionblock([[JSEventObject alloc] initWithData:json], nil);
                                return;
                            }];
     
@@ -112,12 +105,7 @@ enum {
                              block:(void(^)(NSArray *objects, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionblock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -143,19 +131,17 @@ enum {
                                    return;
                                }
                                
+                               
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
                                
-                               NSMutableArray *arr = [NSMutableArray array];
-                               if ([json[@"events"] isEqual:[NSNull null]]) {
-                                   NSString *reason = [NSString stringWithFormat:@"Apparently there are no results for this query."];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
+                               NSError *e = [self checkForJsonError:json query:kJSQueryEvents];
+                               
+                               if (e) {
+                                   completionblock(nil, e);
                                    return;
                                }
                                
+                               NSMutableArray *arr = [NSMutableArray array];
                                NSArray *events = json[@"events"][@"event"];
                                for (NSDictionary *dict in events) {
                                    JSEventObject *event = [[JSEventObject alloc] initWithData:dict];
@@ -167,15 +153,10 @@ enum {
                            }];
 }
 
-- (void)queryForVenueById:(NSString *)venueId block:(void (^)(JSVenueObject * venue, NSError *error))completionBlock
+- (void)queryForVenueById:(NSString *)venueId block:(void (^)(JSVenueObject * venue, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionBlock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -197,13 +178,21 @@ enum {
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                                
                                if (error) {
-                                   completionBlock(nil, error);
+                                   completionblock(nil, error);
                                    return;
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                               
+                               NSError *e = [self checkForJsonError:json query:kJSQueryVenues];
+                               
+                               if (e) {
+                                   completionblock(nil, e);
+                                   return;
+                               }
+                               
                                JSVenueObject *obj = [[JSVenueObject alloc] initWithData:json];
-                               completionBlock(obj, nil);
+                               completionblock(obj, nil);
                            }];
     
 }
@@ -218,12 +207,7 @@ enum {
                              block:(void(^)(NSArray *objects, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionblock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -251,17 +235,13 @@ enum {
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
                                
-                               NSMutableArray *arr = [NSMutableArray array];
-                               if ([json[@"venues"] isEqual:[NSNull null]]) {
-                                   NSString *reason = [NSString stringWithFormat:@"Apparently there are no results for this query."];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
+                               NSError *e = [self checkForJsonError:json query:kJSQueryVenues];
+                               if (e) {
+                                   completionblock(nil, e);
                                    return;
                                }
                                
+                               NSMutableArray *arr = [NSMutableArray array];
                                NSArray *events = json[@"venues"][@"venue"];
                                for (NSDictionary *dict in events) {
                                    JSVenueObject *event = [[JSVenueObject alloc] initWithData:dict];
@@ -275,15 +255,10 @@ enum {
 
 }
 
-- (void)queryForPerformerById:(NSString *)performerId block:(void (^)(JSPerformerObject * performer, NSError * error))completionBlock
+- (void)queryForPerformerById:(NSString *)performerId block:(void (^)(JSPerformerObject * performer, NSError * error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionBlock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -305,13 +280,21 @@ enum {
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                                
                                if (error) {
-                                   completionBlock(nil, error);
+                                   completionblock(nil, error);
                                    return;
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                               
+                               
+                               NSError *e = [self checkForJsonError:json query:kJSQueryPerformers];
+                               if (e) {
+                                   completionblock(nil, e);
+                                   return;
+                               }
+                               
                                JSPerformerObject *obj = [[JSPerformerObject alloc] initWithData:json];
-                               completionBlock(obj, nil);
+                               completionblock(obj, nil);
                            }];
 
 }
@@ -322,12 +305,7 @@ enum {
                                  block:(void(^)(NSArray *objects, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionblock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -354,28 +332,13 @@ enum {
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-                               
-                               if ([json[@"error"] integerValue] == 1) {
-                                   NSString *reason = [NSString stringWithFormat:@"%@", json[@"description"]];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
+                               NSError *e = [self checkForJsonError:json query:kJSQueryPerformers];
+                               if (e) {
+                                   completionblock(nil, e);
                                    return;
                                }
                                
                                NSMutableArray *arr = [NSMutableArray array];
-                               if ([json[@"performers"] isEqual:[NSNull null]]) {
-                                   NSString *reason = [NSString stringWithFormat:@"Apparently there are no results for this query."];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
-                                   return;
-                               }
-                                                              
                                NSArray *events = json[@"performers"][@"performer"];
                                for (NSDictionary *dict in events) {
                                    JSPerformerObject *event = [[JSPerformerObject alloc] initWithData:dict];
@@ -388,15 +351,10 @@ enum {
 
 }
 
-- (void)queryForDemandById:(NSString *)demandId block:(void (^)(JSDemandsObject * demand, NSError * error))completionBlock
+- (void)queryForDemandById:(NSString *)demandId block:(void (^)(JSDemandsObject * demand, NSError * error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionBlock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -418,13 +376,19 @@ enum {
                            completionHandler:^(NSURLResponse *response, NSData *data, NSError *error){
                                
                                if (error) {
-                                   completionBlock(nil, error);
+                                   completionblock(nil, error);
                                    return;
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                               NSError *e = [self checkForJsonError:json query:kJSQueryDemands];
+                               if (e) {
+                                   completionblock(nil, e);
+                                   return;
+                               }
+                               
                                JSDemandsObject *obj = [[JSDemandsObject alloc] initWithData:json];
-                               completionBlock(obj, nil);
+                               completionblock(obj, nil);
                            }];
 
 }
@@ -437,12 +401,7 @@ enum {
                               block:(void(^)(NSArray *objects, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionblock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -469,29 +428,14 @@ enum {
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
-                            
-                               
-                               if ([json[@"error"] integerValue] == 1) {
-                                   NSString *reason = [NSString stringWithFormat:@"%@", json[@"description"]];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
+                               NSError *e = [self checkForJsonError:json query:kJSQueryDemands];
+                               if (e) {
+                                   completionblock(nil, e);
                                    return;
                                }
+
                                
                                NSMutableArray *arr = [NSMutableArray array];
-                               if ([json[@"demands"] isEqual:[NSNull null]]) {
-                                   NSString *reason = [NSString stringWithFormat:@"Apparently there are no results for this query."];
-                                   NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                                                        code:301
-                                                                    userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                                               NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
-                                   completionblock(nil, error);
-                                   return;
-                               }
-                               
                                NSArray *events = json[@"demands"][@"demand"];
                                for (NSDictionary *dict in events) {
                                    JSDemandsObject *event = [[JSDemandsObject alloc] initWithData:dict];
@@ -507,13 +451,7 @@ enum {
 - (void)queryForCategories:(void(^)(NSArray * categories, NSError *error))completionblock
 {
     if ([self.apiKey length] == 0) {
-        NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
-        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
-                                             code:301
-                                         userInfo:@{
-                                                    NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
-                                                    NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
-        completionblock(nil, error);
+        completionblock(nil, [self apiKeyError]);
         return;
     }
     
@@ -540,6 +478,13 @@ enum {
                                }
                                
                                NSDictionary * json = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+                               NSError *e = [self checkForJsonError:json query:nil];
+                               if (e) {
+                                   completionblock(nil, e);
+                                   return;
+                               }
+
+                               
                                NSMutableArray *arr = [NSMutableArray array];
                                for (NSDictionary *dict in [json objectForKey:@"category"]) {
                                    NSDictionary *d = @{@"id" : [dict objectForKey:@"id"],
@@ -648,6 +593,39 @@ enum {
                 self.demandsPageNumber];
     } else if (type == 4) {
         return [NSString stringWithFormat:@"http://api.eventful.com/json/%@/list?app_key=%@", kJSQueryCategories, self.apiKey];
+    }
+    
+    return nil;
+}
+
+- (NSError *)apiKeyError
+{
+    NSString *reason = [NSString stringWithFormat:@"You need to specify an API Key. Head over to Eventful's API website and request one!"];
+    NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
+                                         code:301
+                                     userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
+                                                NSLocalizedRecoverySuggestionErrorKey:@"Head over to Eventful's API website and request one!"}];
+    return error;
+}
+
+- (NSError *)checkForJsonError:(NSDictionary *)json query:(NSString *)query
+{
+    if ([json[@"error"] isEqualToString:@"1"]) {
+        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
+                                             code:301
+                                         userInfo:@{NSLocalizedFailureReasonErrorKey:json[@"description"], NSLocalizedFailureReasonErrorKey:json[@"description"],
+                                                    NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
+        return error;
+    }
+
+    
+    if ([json[query] isEqual:[NSNull null]]) {
+        NSString *reason = [NSString stringWithFormat:@"Apparently there are no results for this query."];
+        NSError *error = [NSError errorWithDomain:@"com.JSEventAPI.api"
+                                             code:301
+                                         userInfo:@{NSLocalizedFailureReasonErrorKey:reason, NSLocalizedFailureReasonErrorKey:reason,
+                                                    NSLocalizedRecoverySuggestionErrorKey:@"Pass different parameters."}];
+        return error;
     }
     
     return nil;

@@ -13,7 +13,7 @@
 #import "JSVenueObject.h"
 #import "JSDemandsObject.h"
 
-#define kJSEventAPIKey @"APIKEY"
+#define kJSEventAPIKey @"APIKey"
 
 @interface ViewController () <JSEventAPIDelegate>
 @property (nonatomic) UIActivityIndicatorView *indicator;
@@ -31,6 +31,7 @@
     JSEventAPI *eventAPI = [JSEventAPI sharedInstance];
     [eventAPI setApiKey:kJSEventAPIKey];
     [eventAPI setDelegate:self];
+    [eventAPI resetPageCounters];
     [eventAPI getCurrentLocation];
     
     indicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhiteLarge];
@@ -114,15 +115,23 @@
 {
     [indicator startAnimating];
     
+    NSString *location = [NSString stringWithFormat:@"%@,%@", [dict objectForKey:@"city"], [dict objectForKey:@"state"]];
+    
     /*
     [[JSEventAPI sharedInstance] queryForEventById:@"E0-001-078254593-2" block:^(JSEventObject *event, NSError *error) {
         [indicator stopAnimating];
+
+        if (error) {
+            [[[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] show];
+            return;
+        }
+
         NSLog(@"%@", event.objects);
     }];
     */
     
-    
-    [[JSEventAPI sharedInstance] queryForEventsWithKeywords:nil geoCoords:nil location:@"San Francisco, CA" date:nil category:nil withinRadius:nil radiusMetric:nil sortByType:nil sortDirection:nil censored:nil block:^(NSArray *objects, NSError *error) {
+    /*
+    [[JSEventAPI sharedInstance] queryForEventsWithKeywords:@"Concert" geoCoords:nil location:location date:nil category:nil withinRadius:nil radiusMetric:nil sortByType:nil sortDirection:nil censored:nil block:^(NSArray *objects, NSError *error) {
         [indicator stopAnimating];
         if (error) {
             [[[UIAlertView alloc] initWithTitle:@"Error" message:[error localizedDescription] delegate:nil cancelButtonTitle:@"Okay" otherButtonTitles:nil] show];
@@ -134,7 +143,7 @@
         }
         
     }];
-    
+    */
     
     /*
     [[JSEventAPI sharedInstance] queryForVenueById:@"V0-001-002084688-9" block:^(JSVenueObject *venue, NSError *error) {
@@ -212,11 +221,12 @@
     */
     
     
-    /*
+    
     [[JSEventAPI sharedInstance] queryForCategories:^(NSArray *categories, NSError *error) {
+        [indicator stopAnimating];
         NSLog(@"%@", categories);
     }];
-    */
+    
 }
 
 - (void)didReceiveMemoryWarning {

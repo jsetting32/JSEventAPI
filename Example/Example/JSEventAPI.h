@@ -60,7 +60,7 @@
  
  @param eventId The ID of the requested event.
  */
-- (void)queryForEventById:(NSString *)eventId block:(void(^)(JSEventObject * event, NSError * error))completionBlock;
+- (void)queryForEventById:(NSString *)eventId block:(void(^)(JSEventObject * event, NSError * error))completionblock;
 
 /*!
  @abstract Query for Events within Eventful API
@@ -105,7 +105,7 @@
  
  @param eventId The ID of the requested venue.
  */
-- (void)queryForVenueById:(NSString *)venueId block:(void(^)(JSVenueObject * venue, NSError * error))completionBlock;
+- (void)queryForVenueById:(NSString *)venueId block:(void(^)(JSVenueObject * venue, NSError * error))completionblock;
 
 /*!
  @abstract Query for Venues within Eventful API
@@ -139,7 +139,7 @@
  
  @param performerId The ID of the requested performer.
  */
-- (void)queryForPerformerById:(NSString *)performerId block:(void(^)(JSPerformerObject * performer, NSError * error))completionBlock;
+- (void)queryForPerformerById:(NSString *)performerId block:(void(^)(JSPerformerObject * performer, NSError * error))completionblock;
 
 /*!
  @abstract Query for Performers within Eventful API
@@ -163,7 +163,7 @@
  
  @param demandId The ID of the requested demand.
  */
-- (void)queryForDemandById:(NSString *)demandId block:(void(^)(JSDemandsObject * demand, NSError * error))completionBlock;
+- (void)queryForDemandById:(NSString *)demandId block:(void(^)(JSDemandsObject * demand, NSError * error))completionblock;
 
 /*!
  @abstract Query for Demanded Events within Eventful API
