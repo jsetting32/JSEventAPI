@@ -13,10 +13,10 @@
 - (id)initWithData:(NSDictionary *)data
 {
     if (!(self = [super init])) return nil;
-    
+
     NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
     [formatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
-    
+
     self.JSEventAddress = (![data[@"address"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"address"]) ? data[@"address"] : @"";
     self.JSEventAllDay =  ([[data allKeys] containsObject:@"all_day"]) ? [NSNumber numberWithBool:[data[@"all_day"] boolValue]] : [NSNumber numberWithBool:false];
     self.JSEventCityName = (![data[@"city_name"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"city_name"]) ? data[@"city_name"] : @"";
@@ -25,20 +25,21 @@
     self.JSEventDescription = (![data[@"description"] isEqual:[NSNull null]]) ? (([data[@"description"] isEqualToString:@" "]) ? @"No Description" : data[@"description"]) : @"No Description";
     if ([self.JSEventDescription isEqualToString:@" "]) self.JSEventDescription = @"No Description";
     self.JSEventGoingCount = (![data[@"going_count"] isEqual:[NSNull null]]) ? [NSNumber numberWithInt:[data[@"going_count"] intValue]] : [NSNumber numberWithInt:0];
-    
+
     self.JSEventId = data[@"id"];
     self.JSEventImage = (![data[@"image"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"image"]) ? data[@"image"][@"medium"][@"url"] : [NSURL URLWithString:@""];
     if ([[data allKeys] containsObject:@"images"]) {
         self.JSEventImage = (![data[@"images"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"images"]) ? data[@"images"][@"image"][@"medium"][@"url"] : [NSURL URLWithString:@""];
     }
-    
-    self.JSEventLocationLatitude = [NSNumber numberWithFloat:[data[@"latitude"] floatValue]];
-    self.JSEventLocationLongitude = [NSNumber numberWithFloat:[data[@"longitude"] floatValue]];
+
+    self.JSEventLocationLatitude = data[@"latitude"] ? [NSNumber numberWithFloat:[data[@"latitude"] floatValue]] : @(0.0);
+    self.JSEventLocationLongitude = data[@"longitude"] ? [NSNumber numberWithFloat:[data[@"longitude"] floatValue]] : @(0.0);
+
     self.JSEventDateModified = (![data[@"modified"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"modified"]) ? [formatter dateFromString:data[@"modified"]] : @"TBD";
     self.JSEventOwner = ([[data allKeys] containsObject:@"owner"]) ? data[@"owner"] : @"";
-    
-    
-    
+
+
+
     if (![data[@"performers"] isEqual:[NSNull null]]) {
         NSMutableArray *arr = [NSMutableArray array];
         if ([data[@"performers"][@"performer"] isKindOfClass:[NSDictionary class]]) {
@@ -54,8 +55,8 @@
     } else {
         self.JSEventPerformers = [NSArray array];
     }
-    
-    
+
+
     self.JSEventZipCode = (![data[@"postal_code"] isEqual:[NSNull null]]) ? [NSNumber numberWithInt:[data[@"postal_code"] intValue]] : [NSNumber numberWithInt:0];
     self.JSEventPrice = (![data[@"price"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"price"]) ? data[@"price"] : @"TBD";
     self.JSEventPrivacy = [NSNumber numberWithBool:[data[@"privacy"] boolValue]];
@@ -70,7 +71,7 @@
     self.JSEventVenueName = ([[data allKeys] containsObject:@"venue_name"]) ? data[@"venue_name"] : @"";
     self.JSEventVenueURL = (![data[@"venue_url"] isEqual:[NSNull null]] && [[data allKeys] containsObject:@"venue_url"]) ? data[@"venue_url"] : [NSURL URLWithString:@""];
     self.JSEventWatchingCount = (![data[@"watching_count"] isEqual:[NSNull null]]) ? [NSNumber numberWithInt:[data[@"watching_count"] intValue]] : [NSNumber numberWithInt:0];
-    
+
     self.objects = [NSDictionary dictionaryWithObjects:@[self.JSEventAddress,
                                                          self.JSEventAllDay,
                                                          self.JSEventCityName,
@@ -127,7 +128,7 @@
                                                          @"venueName",
                                                          @"venueURL",
                                                          @"watchingCount"]];
-    
+
     return self;
 }
 
