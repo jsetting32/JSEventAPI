@@ -1,6 +1,8 @@
 JSEventAPI
 ==========
 
+[![API Testing](https://img.shields.io/badge/API%20Test-RapidAPI-blue.svg)](https://rapidapi.com/package/Eventful/functions?utm_source=EventfulGithub&utm_medium=button&utm_content=Vender_GitHub)
+
 Trying to get millions of events, performers, and venues into your app? Eventful API allows for you to query from their API to receive data but dealing with URL can be messy and a hassle. JSEventAPI handles all that for you! Just specify your location and it will find all events nearby.
 
 <h2>Note</h2>
